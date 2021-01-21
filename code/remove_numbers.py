@@ -2,6 +2,7 @@
 # this program will eliminate all odd numbers from a specific file one at a time, creating a commit for each removal.
 
 import sys
+import subprocess
 
 def eliminate_first_odd(fn):
     lines = open(fn, 'r').readlines()
@@ -14,8 +15,9 @@ def eliminate_first_odd(fn):
             return int_value
     return None
 
-def commit_change(num):
-    print('commit change for removal for %d' % num)
+def commit_change(fn, num):
+    message = 'commit change for removal for %d' % num
+    subprocess.run(['git', 'commit', '-m', message, fn])
 
 
 if __name__ == '__main__':
@@ -30,4 +32,4 @@ if __name__ == '__main__':
             break
         
         # 2. commit, into the current branch, the change removing one odd number
-        commit_change(number_eliminated)
+        commit_change(fn, number_eliminated)
