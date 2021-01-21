@@ -1,0 +1,55 @@
+mkdir biods-number-example
+cd biods-number-example/
+git init
+mkdir data
+mkdir code
+cd data
+seq 100 > numbers.txt
+less numbers.txt
+git add numbers.txt
+git commit -m 'numbers from 1 to 100'
+
+cd code
+chmod u+x remove_numbers.py
+./remove_numbers.py ../data/numbers.txt
+less ../data/numbers.txt
+
+git checkout ../data/numbers.txt
+less ../data/numbers.txt
+
+./remove_numbers.py ../data/numbers.txt
+less ../data/numbers.txt
+
+git reset --hard HEAD
+less ../data/numbers.txt
+
+git checkout -b all_in_one
+
+./remove_numbers.py ../data/numbers.txt
+less ../data/numbers.txt
+
+git log
+# identify hash for boss's lucky number 13
+git revert 09ace9685cfc380ab147c59e5a23d92773e9b354
+
+git diff HEAD^1
+less numbers.txt
+
+git checkout master # or git switch master
+
+git commit remove_numbers.py
+git commit -m 'branch support' remove_numbers.py
+
+./remove_numbers.py --use_branches ../data/numbers.txt
+git diff master eliminate_99
+git branch
+
+for i in `seq 1 2 100`; do git merge --no-edit eliminate_$i; done
+less ../data/numbers.txt
+
+git switch eliminate_55
+less ../data/numbers.txt
+
+git remote add origin git@github.com:rikiyay/biods253-number-example.git
+git branch -M main
+git push -u origin main
