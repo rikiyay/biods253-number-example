@@ -43,15 +43,15 @@ if __name__ == '__main__':
 
     while True:
         # 1. remove the first odd number in the file
-        number_eliminated = eliminate_first_odd(fn, already_eliminated)
+        eliminated_number = eliminate_first_odd(fn, already_eliminated)
         # if None is returned, there no odd numbers in the file
-        if number_eliminated is None:
+        if eliminated_number is None:
             break
         
         if not args.use_branches:
             # 2. commit, into the current branch, the change removing one odd number
-            commit_change(fn, number_eliminated)
+            commit_change(fn, eliminated_number)
         else:
-            create_branch(number_eliminated)
-            commit_change(fn, number_eliminated)
+            create_branch(eliminated_number)
+            commit_change(fn, eliminated_number)
             switch_branch(args.default_branch)
