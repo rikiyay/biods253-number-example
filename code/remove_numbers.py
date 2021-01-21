@@ -3,14 +3,23 @@
 
 import sys
 import subprocess
+import argparse
 
-def eliminate_first_odd(fn):
+parser = argparse.ArgumentParser(description='eliminate odd numbers from a file and use git')
+parser.add_argument('filename', metavar='filename', help='the file path to process')
+parser.add_argument('--use_branches', dest='use_branches', action='store_true', help='use branches to eliminate numbers')
+parser.add_argument('--default_branch', default='master', help='default branch')
+
+args = parser.parse_args()
+
+def eliminate_first_odd(fn, already_eliminated):
     lines = open(fn, 'r').readlines()
     for lineno, line in enumerate(lines):
         int_value = int(line)
         is_odd = ((int(line) % 2) == 1)
-        if is_odd:
+        if is_odd and (int_value not in already_eliminated):
             lines = lines[:lineno] + lines[lineno+1:]
+            already_eliminated.add(int_value)
             open(fn, 'w').write(''.join(lines))
             return int_value
     return None
@@ -19,17 +28,30 @@ def commit_change(fn, num):
     message = 'commit change for removal for %d' % num
     subprocess.run(['git', 'commit', '-m', message, fn])
 
+def create_branch(num):
+    subprocess.run(['git', 'checkout', '-b', 'eliminate_%d' % num])
+
+def switch_branch(branch_name):
+    subprocess.run(['git', 'checkout', branch_name])
+
 
 if __name__ == '__main__':
 
-    fn = sys.argv[1]
+    # fn = sys.argv[1]
+    fn = args.filename
+    already_eliminated = set()
 
     while True:
         # 1. remove the first odd number in the file
-        number_eliminated = eliminate_first_odd(fn)
+        number_eliminated = eliminate_first_odd(fn, already_eliminated)
         # if None is returned, there no odd numbers in the file
         if number_eliminated is None:
             break
         
-        # 2. commit, into the current branch, the change removing one odd number
-        commit_change(fn, number_eliminated)
+        if not args.use_branches:
+            # 2. commit, into the current branch, the change removing one odd number
+            commit_change(fn, number_eliminated)
+        else:
+            create_branch(number_eliminated)
+            commit_change(fn, number_eliminated)
+            switch_branch(args.default_branch)
